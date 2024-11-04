@@ -1,7 +1,7 @@
 <template>
   <b-card class="mb-4 line-chart">
     <div class="mt-4 test">
-      <v-chart class="chart" :option="option" @mouseover="getDataSubset" autoresize/>
+      <v-chart class="chart" :option="option" autoresize/>
     </div>
   </b-card>
 </template>
@@ -52,7 +52,7 @@ var timeLineSet = function(value) {
   return `${hours}:${minutes}`;
 }
 
-var tooltipDisplay = ''
+
 
 export default {
   name: "HelloWorld",
@@ -80,16 +80,65 @@ export default {
           //selected:{'sm-0002':false,'sm-0004':false,'sm-00024':false,'sm-0020':false,'sm-0010':false,'sm-0011':false,'sm-0015':false,'sm-0030':false,'sm-0016:':false,'sm-0025':false,'sm-0017':false,'sm-0018':false,'sm-0008':false,'sm-0009':false}
         },
         tooltip: {
-          backgroundColor: '', // Set your desired background color
-          trigger: 'axis',
+          trigger: 'axis', // Tooltip triggered by axis, not just data points
+          axisPointer: {
+              type: 'line', // Shows a line to indicate the axis position
+              label: {
+              backgroundColor: '#6a7985' // Optional: Customize the label background color
+              }
+          },
+          backgroundColor: '', // Your custom background color
           borderWidth: 0, // Set border width to 0 to remove the border
           shadowBlur: 0, // Set shadow blur to 0 to remove the shadow
           shadowOffsetX: 0, // Set shadow offset X to 0
           shadowOffsetY: 0, // Set shadow offset Y to 0
           shadowColor: 'transparent', // Set shadow color to transparent
-          formatter: () => {
-              return tooltipDisplay;
-          },
+          formatter: (params) => {
+                    if (params && params.length) {
+                    let tooltipContent = `<div class="tooltip-set" style="text-align:left; padding:0; margin:0; background-color: black; border-radius: 8px;">`;
+                    //let cumulativeValue = 0;
+                    let localTime;                    
+                    // Loop over each series data point
+                    params.forEach(param => {
+                        //const socValue = param.data[1];
+                        
+                        //cumulativeValue += socValue; // Add current SoC value to cumulative total
+                        let utcTime = new Date(param.data[0]);
+                        const hours = utcTime.getUTCHours().toString().padStart(2, '0');
+                        const minutes = utcTime.getUTCMinutes().toString().padStart(2, '0');
+                        const day = utcTime.getUTCDate().toString().padStart(2, '0');
+                        const month = (utcTime.getUTCMonth() + 1).toString().padStart(2, '0'); // Months are 0-indexed
+                        const year = utcTime.getUTCFullYear();
+
+                        // Construct time in the desired format: 13:13 | 01.10.2024
+                        localTime = `${hours}:${minutes} | ${day}.${month}.${year}`;                       
+                       
+                        tooltipContent += `
+                        <div style="padding-right:15px;padding-left:15px;padding-top:3px;padding-bottom:3px;margin-bottom:0;border-bottom-left-radius: 8px;border-bottom-right-radius: 8px;">
+                            <ul style="list-style-type: none; margin: 0; padding-left: 0;">
+                            <li>
+                                <div class="color-point" style="width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 5px; background-color: ${param.color};"></div>
+                                <span style="color: gray;">${param.seriesName}: </span><span style="color: white;">${param.data[1]} MW/h</span>
+                            </li>
+                            </ul>
+                        </div>`;
+                    });
+                    // Append cumulative SoC value at the end of the tooltip
+                    // Add the total cumulative SoC to the tooltip content at the end
+
+                    let footer = ''
+
+                    footer = `
+                      <div style="color: white; padding: 10px; background-color: #333; border-top: 1px solid #999;">                                              
+                          <strong>Time: </strong> <span style="color: white;">${localTime}</span>
+                      </div>`;
+                    
+                    tooltipContent += footer
+
+                    return tooltipContent;
+                    }
+                    return ''; // Return an empty string if there's no data to show
+                }
          
         
         },
@@ -158,7 +207,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['dateRange','selectedDev','checkedDevs','selectBoxDevs']),
+    ...mapState(['dateRange','selectedDev','checkedDevs','selectBoxDevs', 'sliderValue']),
 
     lastRouteSegment() {
     const pathArray = this.$route.path.split('/');    
@@ -184,6 +233,12 @@ export default {
     },
     deep: true // If selectBoxDevs is an array or object, use deep: true
   },
+
+  sliderValue(newSlider, oldSlider) {
+      if (newSlider !== oldSlider) {
+        this.fetchData();
+      }
+    },
     
     dateRange(newRange, oldRange) {
       if (newRange !== oldRange) {
@@ -218,30 +273,6 @@ export default {
   methods: {
 
    
-    getDataSubset(params) {
-      
-
-      if(params.seriesType == 'line'){
-        if (params.data){
-          
-          tooltipDisplay = '<div class="tooltip-set" style="text-align:left; padding:0; margin:0; background-color: black; border-radius: 8px;">' +
-                    '<div style="vertical-align: middle; color: white; padding-left: 10px;">' + params.seriesName + '</div>' +
-                    '<div style="padding-right:15px;padding-left:15px;padding-top:3px;padding-bottom:3px;margin-bottom:0;background-color: #272b34;border-bottom-left-radius: 8px;border-bottom-right-radius: 8px;">' +
-                      '<ul style="list-style-type: none; margin: 0; padding-left: 0;">' +
-                        '<li>' +
-                          '<div class="color-point" style="width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 5px; background-color: ' + params.color + ';"></div>' +
-                          '<span style="color: gray;">Power: </span><span style="color: white;">' + params.data[1] + '</span>'  +
-                        '</li>' +
-                        '<li>' +
-                          '<span style="color: gray;">Time: </span><span style="color: white;">' + params.data[0].split(":00Z")[0] + '</span>' +
-                        '</li>'+
-                      '</ul>' +
-                    '</div>' +
-                  '</div>';
-        }
-      }   
-
-    },
 
     setHourlyAxisLabels() {
       // Update xAxis axisLabel formatter and interval
@@ -291,6 +322,9 @@ export default {
       if(this.dateRange == 'today')
       {
         this.created_date_or_created = 'created_date'
+        if(this.sliderValue.value == 15 || this.sliderValue.value == 60){
+          this.created_date_or_created = 'created'
+        }
       }
       else{
         this.created_date_or_created = 'created'
@@ -315,6 +349,20 @@ export default {
           url = `http://85.14.6.37:16455/api/posts/?date_range=${this.dateRange}&dev=${this.selectedDev}`
           
           urlForecast = `http://85.14.6.37:16454/api/forecast?date_range=${this.dateRange}&devId=${this.selectedDev}`
+          if(this.dateRange == 'today'){            
+              if(this.sliderValue)
+              {
+                if (this.sliderValue.value == 15){
+                  url = `http://85.14.6.37:16455/api/resample_data/?resample=15min&devId=${this.selectedDev}`
+                }
+                else if(this.sliderValue.value == 60){
+                  url = `http://85.14.6.37:16455/api/resample_data/?resample=60min&devId=${this.selectedDev}`
+                }
+                else{
+                  url = `http://85.14.6.37:16455/api/posts/?date_range=${this.dateRange}&dev=${this.selectedDev}`
+                }
+              }
+          }
           
           //urlForecast = `http://127.0.0.1:8000/api/forecast/?devId=${this.selectedDev}`
           
@@ -335,7 +383,8 @@ export default {
         
         axios.all([requestOne, requestTwo]).then(axios.spread((...responses) => {
           
-          let devData = responses[0].data          
+          let devData = responses[0].data  
+          console.log("devData", devData)        
 
           let forecastData = responses[1].data
           
@@ -375,7 +424,7 @@ export default {
             if (this.lastRouteSegment !== 'entra' && forecastData && forecastData.length > 0) {
                 let test = forecastData.map((item) =>[item.timestamp, item.power.toFixed(2)])
                 
-                console.log(test)
+                
                 // Add another series for forecastData
                 this.option.title.text = "Power kW"
                 seriesData.push({
@@ -385,7 +434,7 @@ export default {
                     showSymbol: false,
                     
                     connectNulls: false,
-                    lineStyle: { width: 1,type: 'dotted', },
+                    lineStyle: { width: 1,type: 'dotted', color:'yellow' },
                     //data: forecastData.map((item) => [item[this.created_date_or_created], item.value]),
                     data: test
 

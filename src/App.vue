@@ -64,7 +64,7 @@ export default {
         // Map device IDs to device objects, incorporating coords data
         this.all = deviceIds.map(id => {
             // Find coordinates for the current device, if available
-            const coord = coords.find(coord => coord[id]);
+            const coord = coords.find(coord => coord[id]);            
             const deviceType = ['sm-0001', 'sm-0016'].includes(id) ? 'Producer' : 'Consumer';
             
             return {
@@ -75,18 +75,13 @@ export default {
             long: coord ? coord[id].long : undefined,                  
             type: deviceType,
             customer:'',
-            capacity:''            
+            capacity: coord ? coord[id].capacity :undefined            
             };
            
         });
-        this.allDevsCreation(this.all);
         
+        this.allDevsCreation(this.all);
 
-        // Directly generate ids and forecastIds from the all array
-        // this.ids = this.all.map(device => device.id);
-        // this.forecastIds = this.ids.map(id => `${id}F`);
-        // //commit all to store
-        // this.allDevsCreation(this.all);
     },
     doSubscribe() {
         const { topic, qos } = this.subscription;
@@ -142,17 +137,6 @@ export default {
           const parsedPayload = JSON.parse(payload);
           let dev = topic.split("/")[1]
           let pow = parsedPayload.payload.power
-
-          this.sm_coeff.forEach(el=>{
-            let keyId = Object.keys(el);                
-              if(keyId[0] === dev){
-                if(keyId[0] === "sm-0001" || keyId[0] === "sm-0016")
-                {
-                  pow *=-1
-                }
-                pow *=el[keyId[0]]
-              }
-          })
           let devObj = {
             "dev":dev,
             "power":pow.toFixed(2),

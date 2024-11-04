@@ -6,12 +6,16 @@
         </b-col>
         <b-col cols="3">            
             <RangeComponent class="mb-4" />          
-        </b-col>      
+        </b-col>     
+        
         <b-col v-if="isDevSelected" cols="12">        
             <!-- <AwesomeCards /> -->
             <SalesCard />
       </b-col>        
         <b-col cols="8">
+          <b-col cols="3">
+            <SliderComponent class="mb-4" />
+        </b-col> 
             <LineChart />
         </b-col>
         <b-col cols="4">
@@ -45,6 +49,7 @@
   import SalesCard from "../dashboard-components/sales-card/SalesCard.vue";
   import WeatherChartClouds from "../dashboard-components/echarts/WeatherChartClouds.vue";
 import CorelationsHeat from "../dashboard-components/echarts/CorelationsHeat.vue";
+import SliderComponent from "../dashboard-components/slider-component/SliderComponent.vue";
 
 
 
@@ -70,7 +75,8 @@ import CorelationsHeat from "../dashboard-components/echarts/CorelationsHeat.vue
     CustomProgress,
     SalesCard,
     WeatherChartClouds,
-    CorelationsHeat
+    CorelationsHeat,
+    SliderComponent
     
 },
 

@@ -7,6 +7,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     selectedDev: '',
+    sliderValue : {},
     all_devs: [],
     checkedDevs:[],
     selectBoxDevs:[],
@@ -31,6 +32,12 @@ export default new Vuex.Store({
     ],
   },
   mutations: {
+
+    SET_SLIDER_VALUE(state, payload){
+      
+      state.sliderValue = payload
+    },
+
     CREATE_SELECT_BOX_DEVS(state, payload){
       
       state.selectBoxDevs = payload
@@ -87,6 +94,10 @@ export default new Vuex.Store({
 
   },
   actions: {
+
+    updateSliderValue({ commit }, newRange) {
+      commit('SET_SLIDER_VALUE', newRange);
+    },
     updateDateRange({ commit }, newRange) {
       commit('SET_DATE_RANGE', newRange);
     },

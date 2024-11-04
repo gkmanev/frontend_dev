@@ -20,7 +20,7 @@
     computed: {
       ...mapState(['all_devs', 'selectedDev'])     
     }, 
-    mounted() {
+    mounted() {     
       this.populateOptions();
       if (this.selectedDev) {
         this.selected = this.selectedDev;
@@ -40,7 +40,7 @@
         ({                    
           value: dev.id, 
           text: dev.id,  
-          online: dev.online                  
+          //online: dev.online                  
         }));        
         devOptions.forEach(el => {        
           if (el.online !== 'offline') {   
