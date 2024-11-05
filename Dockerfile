@@ -1,7 +1,7 @@
 # Build step 1(installing node modules and preparing compiled build)
 
 # Use an official Node.js image as the base image
-FROM node:16 as builder
+FROM node:14 as builder
 
 # Set the working directory in the container
 WORKDIR /usr/src/app
@@ -10,7 +10,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install --legacy-peer-deps
+RUN npm install
 
 # Copy the rest of the application code to the working directory
 COPY . .
