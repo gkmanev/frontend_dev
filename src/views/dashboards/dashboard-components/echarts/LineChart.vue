@@ -322,9 +322,9 @@ export default {
       if(this.dateRange == 'today')
       {
         this.created_date_or_created = 'created_date'
-        if(this.sliderValue.value == 15 || this.sliderValue.value == 60){
-          this.created_date_or_created = 'created'
-        }
+        // if(this.sliderValue.value == 15 || this.sliderValue.value == 60){
+        //   this.created_date_or_created = 'created'
+        // }
       }
       else{
         this.created_date_or_created = 'created'
@@ -405,6 +405,8 @@ export default {
                     .filter((item) => item.devId === devId)
                     .map((item) => [item[this.created_date_or_created], item.value]),
             };
+            console.log(baseSeriesConfig)
+            
            
             if (this.lastRouteSegment == 'entra') {
                 return {
