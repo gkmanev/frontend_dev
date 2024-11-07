@@ -351,15 +351,19 @@ export default {
               {
                 if (this.sliderValue.value == 15){
                   url = `http://85.14.6.37:16455/api/resample_data/?resample=15min&devId=${this.selectedDev}`
+                  urlForecast = `http://85.14.6.37:16454/api/forecast?date_range=${this.dateRange}&devId=${this.selectedDev}&resample=15T`
                 }
                 else if (this.sliderValue.value == 30){
                   url = `http://85.14.6.37:16455/api/resample_data/?resample=30min&devId=${this.selectedDev}`
+                  urlForecast = `http://85.14.6.37:16454/api/forecast?date_range=${this.dateRange}&devId=${this.selectedDev}&resample=30T`
                 }
                 else if (this.sliderValue.value == 45){
                   url = `http://85.14.6.37:16455/api/resample_data/?resample=45min&devId=${this.selectedDev}`
+                  urlForecast = `http://85.14.6.37:16454/api/forecast?date_range=${this.dateRange}&devId=${this.selectedDev}&resample=45T`
                 }
                 else if(this.sliderValue.value == 60){
                   url = `http://85.14.6.37:16455/api/resample_data/?resample=60min&devId=${this.selectedDev}`
+                  urlForecast = `http://85.14.6.37:16454/api/forecast?date_range=${this.dateRange}&devId=${this.selectedDev}&resample=60T`
                 }
                 else{
                   url = `http://85.14.6.37:16455/api/posts/?date_range=${this.dateRange}&dev=${this.selectedDev}`
@@ -387,7 +391,7 @@ export default {
         axios.all([requestOne, requestTwo]).then(axios.spread((...responses) => {
           
           let devData = responses[0].data  
-          console.log("devData", devData)        
+                
 
           let forecastData = responses[1].data
           
@@ -408,7 +412,7 @@ export default {
                     .filter((item) => item.devId === devId)
                     .map((item) => [item[this.created_date_or_created], item.value]),
             };
-            console.log(baseSeriesConfig)
+            
             
            
             if (this.lastRouteSegment == 'entra') {
