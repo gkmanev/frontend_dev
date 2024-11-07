@@ -322,9 +322,6 @@ export default {
       if(this.dateRange == 'today')
       {
         this.created_date_or_created = 'created_date'
-        // if(this.sliderValue.value == 15 || this.sliderValue.value == 60){
-        //   this.created_date_or_created = 'created'
-        // }
       }
       else{
         this.created_date_or_created = 'created'
@@ -354,6 +351,12 @@ export default {
               {
                 if (this.sliderValue.value == 15){
                   url = `http://85.14.6.37:16455/api/resample_data/?resample=15min&devId=${this.selectedDev}`
+                }
+                else if (this.sliderValue.value == 30){
+                  url = `http://85.14.6.37:16455/api/resample_data/?resample=30min&devId=${this.selectedDev}`
+                }
+                else if (this.sliderValue.value == 45){
+                  url = `http://85.14.6.37:16455/api/resample_data/?resample=45min&devId=${this.selectedDev}`
                 }
                 else if(this.sliderValue.value == 60){
                   url = `http://85.14.6.37:16455/api/resample_data/?resample=60min&devId=${this.selectedDev}`
