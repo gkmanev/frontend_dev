@@ -153,7 +153,7 @@
             },
 
         fetchCorrelationDataFromAPI(devId) {
-            let url = `http://85.14.6.37:16454/api/correlations/?devId=${devId}`
+            let url = `http://85.14.6.37:2323/api/correlations/?devId=${devId}`
             if(url){                
                 axios
                 .get(url)

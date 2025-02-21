@@ -344,26 +344,27 @@ export default {
         if(this.selectedDev)
         {
           url = `http://85.14.6.37:16455/api/posts/?date_range=${this.dateRange}&dev=${this.selectedDev}`
-          
-          urlForecast = `http://85.14.6.37:16454/api/forecast?date_range=${this.dateRange}&devId=${this.selectedDev}`
+          console.log("url",url)
+          urlForecast = `http://85.14.6.37:2323/api/forecast?date_range=${this.dateRange}&devId=${this.selectedDev}`
+          console.log(urlForecast)
           if(this.dateRange == 'today'){            
               if(this.sliderValue)
               {
                 if (this.sliderValue.value == 15){
                   url = `http://85.14.6.37:16455/api/resample_data/?resample=15min&devId=${this.selectedDev}`
-                  urlForecast = `http://85.14.6.37:16454/api/forecast?date_range=${this.dateRange}&devId=${this.selectedDev}&resample=15T`
+                  urlForecast = `http://85.14.6.37:2323/api/forecast?date_range=${this.dateRange}&devId=${this.selectedDev}&resample=15T`
                 }
                 else if (this.sliderValue.value == 30){
                   url = `http://85.14.6.37:16455/api/resample_data/?resample=30min&devId=${this.selectedDev}`
-                  urlForecast = `http://85.14.6.37:16454/api/forecast?date_range=${this.dateRange}&devId=${this.selectedDev}&resample=30T`
+                  urlForecast = `http://85.14.6.37:2323/api/forecast?date_range=${this.dateRange}&devId=${this.selectedDev}&resample=30T`
                 }
                 else if (this.sliderValue.value == 45){
                   url = `http://85.14.6.37:16455/api/resample_data/?resample=45min&devId=${this.selectedDev}`
-                  urlForecast = `http://85.14.6.37:16454/api/forecast?date_range=${this.dateRange}&devId=${this.selectedDev}&resample=45T`
+                  urlForecast = `http://85.14.6.37:2323/api/forecast?date_range=${this.dateRange}&devId=${this.selectedDev}&resample=45T`
                 }
                 else if(this.sliderValue.value == 60){
                   url = `http://85.14.6.37:16455/api/resample_data/?resample=60min&devId=${this.selectedDev}`
-                  urlForecast = `http://85.14.6.37:16454/api/forecast?date_range=${this.dateRange}&devId=${this.selectedDev}&resample=60T`
+                  urlForecast = `http://85.14.6.37:2323/api/forecast?date_range=${this.dateRange}&devId=${this.selectedDev}&resample=60T`
                 }
                 else{
                   url = `http://85.14.6.37:16455/api/posts/?date_range=${this.dateRange}&dev=${this.selectedDev}`
