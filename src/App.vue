@@ -54,12 +54,40 @@ export default {
   },
   methods:{
     ...mapActions(['allDevsCreation']),
+
+    parseMalformedPayload(raw) {
+    const match = raw.match(/"payload"\s*:\s*{(.*)}/);
+    if (!match) {
+      console.error("Invalid payload format");
+      return null;
+    }
+
+    const parts = match[1].split(',');
+    const payloadObj = {};
+
+    parts.forEach((item, index) => {
+      if (item.includes(':')) {
+        const [key, value] = item.split(':');
+        payloadObj[key.trim()] = parseFloat(value.trim());
+      } else if (index === 0) {
+        payloadObj['timestamp'] = parseInt(item.trim());
+      }
+    });
+
+    return { payload: payloadObj };
+  },
     
     createAllDevs() {
         // Generate device IDs upfront with the correct format
-        const deviceIds = Array.from({ length: 31 }, (_, i) =>
+        let deviceIds = Array.from({ length: 31 }, (_, i) =>
             `sm-${(i + 1).toString().padStart(4, '0')}`
         );
+        const sikoDevsIds = Array.from({ length: 31 }, (_, i) =>
+          `sm-${(i + 40).toString()}`
+        );
+
+        deviceIds = deviceIds.concat(sikoDevsIds);
+
 
         // Map device IDs to device objects, incorporating coords data
         this.all = deviceIds.map(id => {
@@ -86,6 +114,7 @@ export default {
     doSubscribe() {
         const { topic, qos } = this.subscription;
         this.client.subscribe(topic, { qos: qos });
+        this.client.subscribe("siko/+", { qos: qos }); // second topic
     },
     createConnection() {
         try {
@@ -132,7 +161,20 @@ export default {
         try {
           const topic = message.destinationName;
           const payload = message.payloadString;
+          if (topic.startsWith('siko/')){
+            const parsedPayload = this.parseMalformedPayload(payload);
+            if (!parsedPayload) return;
 
+            // Update all relevant devices in `this.all`
+            Object.entries(parsedPayload.payload).forEach(([key, value]) => {
+              const found = this.all.find(dev => dev.id === key);
+              if (found) {
+                found.power = value.toFixed(2);
+                found.online = 'online';
+              }
+            });
+          }
+          else if (topic.startsWith('ping/')){
           // Process the incoming message here
           const parsedPayload = JSON.parse(payload);
           let dev = topic.split("/")[1]
@@ -169,8 +211,10 @@ export default {
               found.online = 'offline'
             }          
             
-          }          
+          } 
+        }         
           this.allDevsCreation(this.all);
+        
         } catch (error) {
           console.error('Error processing MQTT message:', error);
         }

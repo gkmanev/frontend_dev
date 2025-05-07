@@ -346,7 +346,7 @@ export default {
           url = `http://85.14.6.37:16455/api/posts/?date_range=${this.dateRange}&dev=${this.selectedDev}`
           console.log("url",url)
           urlForecast = `http://85.14.6.37:2323/api/forecast?date_range=${this.dateRange}&devId=${this.selectedDev}`
-          console.log(urlForecast)
+        
           if(this.dateRange == 'today'){            
               if(this.sliderValue)
               {

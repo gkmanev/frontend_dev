@@ -91,7 +91,7 @@ export default {
 
         axios.all([requestOne, requestTwo]).then(axios.spread((...responses) => {
           let devData = responses[0].data
-              
+           
           
           let forecastData = responses[1].data;
 
