@@ -129,7 +129,7 @@
       },
       async fetchGridAssignments() {
         const response = await axios.get('http://85.14.6.37:16455/api/grid_asign/');
-        console.log("ddata",response.data)
+       
         return response.data;
       },
       updateTreeData(onlineDevices, gridAssignments) {

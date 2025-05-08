@@ -42,7 +42,7 @@ var timeLineSet = function(value) {
   let date = new Date(value);
 
   // Get UTC hours and minutes
-  let hours = date.getUTCHours();
+  let hours = date.getUTCHours() + 3;
   let minutes = date.getUTCMinutes();
 
   // Format hours and minutes to ensure two digits

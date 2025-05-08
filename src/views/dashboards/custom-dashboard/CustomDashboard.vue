@@ -15,9 +15,9 @@
         <b-col cols="12">
             <PriceChart />
         </b-col>
-        <b-col cols="12">
+        <!-- <b-col cols="12">
             <MapCard />
-        </b-col>
+        </b-col> -->
         <b-col cols="12">
             <TableChart />
         </b-col>        
@@ -47,7 +47,7 @@
   import TableChart from "../dashboard-components/echarts/TableChart";
 
   import GridNodes from "../dashboard-components/echarts/GridNodes";
-  import MapCard from '../dashboard-components/echarts/MapCard.vue';
+  //import MapCard from '../dashboard-components/echarts/MapCard.vue';
   //import HighChartTest from '../dashboard-components/echarts/HighChartTest.vue';
   
 
@@ -90,7 +90,7 @@
     LineChart,
     PriceChart,
     TableChart,   
-    MapCard,
+    //MapCard,
     GridNodes,
     //HighChartTest 
     
