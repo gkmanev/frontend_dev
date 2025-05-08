@@ -6,9 +6,9 @@
         <b-col cols="3">            
             <RangeComponent class="mb-4"  @filter="handleFilter" />          
         </b-col>
-        <b-col cols="12">
+        <!-- <b-col cols="12">
             <HighChartTest />
-        </b-col>
+        </b-col> -->
         <b-col cols="12" v-if="show">
             <LineChart />
         </b-col>
@@ -48,7 +48,7 @@
 
   import GridNodes from "../dashboard-components/echarts/GridNodes";
   import MapCard from '../dashboard-components/echarts/MapCard.vue';
-  import HighChartTest from '../dashboard-components/echarts/HighChartTest.vue';
+  //import HighChartTest from '../dashboard-components/echarts/HighChartTest.vue';
   
 
 
@@ -60,7 +60,7 @@
     name: "ModernDashboard",
     data: () => ({
       title: "ModernDashboard",
-      show:false,
+      show:true,
       // Month Table
       month1: 0,
       monthoptions1: [
@@ -92,7 +92,7 @@
     TableChart,   
     MapCard,
     GridNodes,
-    HighChartTest 
+    //HighChartTest 
     
 },
     methods: {

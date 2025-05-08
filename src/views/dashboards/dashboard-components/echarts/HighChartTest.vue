@@ -53,10 +53,18 @@ export default {
   },
   methods: {
     populateTraceVisibility() {
-      for (let i = 1; i <= 30; i++) {
-        const devId = 'sm-' + ('000' + i).slice(-4); // Generate devId with leading zeros
-        this.$set(this.traceVisibility, devId, true); // Set visibility for each devId
-      }
+      // for (let i = 1; i <= 30; i++) {
+      //   const devId = 'sm-' + ('000' + i).slice(-4); // Generate devId with leading zeros
+      //   this.$set(this.traceVisibility, devId, true); // Set visibility for each devId
+      // }
+      const devIds = Array.from({ length: 31 }, (_, i) =>
+          `sm-${(i + 40).toString()}`
+      );
+      devIds.forEach(el => {
+        const devId = el;
+        this.$set(this.traceVisibility, devId, true);
+      })
+      console.log(this.traceVisibility)
     },
     fetchData() {
       let url = '';
@@ -65,7 +73,7 @@ export default {
       if (this.$route.path.endsWith('entra')) {
         //url = `http://85.14.6.37:16455/api/posts/?date_range=${this.dateRange}`;
         if (this.dateRange == "today"){
-          url = `http://85.14.6.37:16455/api/consistance/?date_range=today`          
+          url = `http://85.14.6.37:16455/api/posts/?date_range=today`          
         }
         else{
           url =  `http://85.14.6.37:16455/api/posts/?date_range=${this.dateRange}`       
@@ -104,7 +112,7 @@ export default {
     //createPlotlyChart(devData, forecastData)
     createPlotlyChart(devData) {
   const traces = [];
-
+     
   if (devData && devData.length > 0) {
     if (this.dateRange != 'today') {
       this.created_date_or_created = 'created';
@@ -114,9 +122,12 @@ export default {
       this.created_date_or_created = 'created_date';
     }
 
-    const devIds = [...new Set(devData.map(item => item.devId))];
+    //const devIds = [...new Set(devData.map(item => item.devId))];
     const uniqueDates = [...new Set(devData.map(item => item[this.created_date_or_created]))];
-
+    const devIds = Array.from({ length: 31 }, (_, i) =>
+          `sm-${(i + 40).toString()}`
+    );
+    console.log(devIds)
     // Initialize trace for each device
     devIds.forEach(devId => {
       if (this.traceVisibility[devId]) {

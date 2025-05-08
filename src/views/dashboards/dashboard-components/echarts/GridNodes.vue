@@ -59,7 +59,7 @@
               id: 0,
               name: 'tree1',
               data: [{
-                name: 'EnergoPro',
+                name: 'Siko Trans',
                 children: [],
               }],
             //   top: '25%',
@@ -104,6 +104,7 @@
         try {
           const onlineDevices = await this.fetchOnlineDevices();
           const gridAssignments = await this.fetchGridAssignments();
+         
           this.updateTreeData(onlineDevices, gridAssignments);
         } catch (error) {
           console.error(error);
@@ -117,19 +118,18 @@
         
         this.all_devs.forEach(el=>{
           if(el.online == "not-ready")
-          {
-            
+          {           
             online_arr.push(el)
           }
         })
-        
+      
         return online_arr
         
 
       },
       async fetchGridAssignments() {
         const response = await axios.get('http://85.14.6.37:16455/api/grid_asign/');
-        
+        console.log("ddata",response.data)
         return response.data;
       },
       updateTreeData(onlineDevices, gridAssignments) {
@@ -192,7 +192,7 @@
         //   grid.name = `${grid.name} | ${grid.value} kW`;
         // });
   
-        this.chartOption.series[0].data = [{ name: 'EnergoPro', children: treeData }];
+        this.chartOption.series[0].data = [{ name: 'Siko Trans', children: treeData }];
       },
       // determineDeviceStatus(device) {
       //   if (device.ready === 1) {

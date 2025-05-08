@@ -83,11 +83,11 @@
            </template> -->
          </b-table>
  
-         <p class="btn-grp">
+         <!-- <p class="btn-grp">
            <b-button size="sm" variant="outline-primary" @click="selectAllRows">Select all</b-button>
            <b-button size="sm" variant="outline-danger" @click="clearSelected">Clear selected</b-button>
          </p>
-         <p>Selected Rows:<br />{{ selected }}</p>
+         <p>Selected Rows:<br />{{ selected }}</p> -->
        </b-card>
      </b-col>
    </b-row>
@@ -294,11 +294,56 @@
          clearSelected() {
          this.$refs.selectableTable.clearSelected();
          },
+
+        updateDeviceStatus() {
+          const deviceMap = {}
+          this.all = []
+          // Index all_devs by ID
+          this.all_devs.forEach(dev => {
+            deviceMap[dev.id] = dev
+          })
+
+          // Loop through online data and update matching devices
+          this.online.forEach(entry => {
+            const dev = deviceMap[entry.devId]
+            if (dev) {
+              dev.online = entry.value >= 0 ? 'not-ready' : 'offline'
+              dev.power = entry.value
+            }            
+          })
+          this.all = Object.values(deviceMap).sort((a, b) => {
+            const aId = parseInt(a.id.split('-')[1])
+            const bId = parseInt(b.id.split('-')[1])
+            return aId - bId
+          })
+          .filter(dev => dev.id !== 'sm-54' && dev.id !== 'sm-55')
+        },
  
        
       
        async createAllDevs() {        
-         this.all = this.all_devs      
+         //this.all = this.all_devs
+         let url =  `http://85.14.6.37:16455/api/siko/?date_range=today`
+         axios.get(url)
+        .then(response => {
+          const data = response.data;  
+          const mostRecentTimestamp = data.reduce((latest, item) => {
+            return new Date(item.created_date) > new Date(latest) ? item.created_date : latest;
+          }, data[0]?.created_date); 
+          const uniqueLatestRecords = Object.values(
+            data
+              .filter(item => item.created_date === mostRecentTimestamp)
+              .reduce((acc, item) => {
+                acc[item.devId] = item; // override any duplicate devId
+                return acc;
+              }, {})
+          );
+          this.online = uniqueLatestRecords;
+     
+          this.updateDeviceStatus();
+       
+        })      
+         
        } 
      },
    

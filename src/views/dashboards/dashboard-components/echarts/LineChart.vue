@@ -332,7 +332,7 @@ export default {
       if (this.lastRouteSegment == 'entra')
       {
         if (this.dateRange == 'today'){
-          url = `http://85.14.6.37:16455/api/consistance/?date_range=today`    
+          url = `http://85.14.6.37:16455/api/posts/?date_range=today`    
         }
         else{
           url = `http://85.14.6.37:16455/api/posts/?date_range=${this.dateRange}`
@@ -397,9 +397,12 @@ export default {
           let forecastData = responses[1].data
           
           
-          if(devData){
+          if(devData){            
            
-            const devIds = Array.from(new Set(devData.map((item) => item.devId)));  
+            //const devIds = Array.from(new Set(devData.map((item) => item.devId)));
+            const devIds = Array.from({ length: 31 }, (_, i) =>
+              `sm-${(i + 40).toString()}`
+            );  
             const seriesData = devIds.map((devId) => {
               const baseSeriesConfig = {
                 name: devId,

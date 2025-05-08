@@ -78,11 +78,12 @@ export default {
   },
     
     createAllDevs() {
+        let deviceIds = []
         // Generate device IDs upfront with the correct format
-        let deviceIds = Array.from({ length: 31 }, (_, i) =>
-            `sm-${(i + 1).toString().padStart(4, '0')}`
-        );
-        const sikoDevsIds = Array.from({ length: 31 }, (_, i) =>
+        // let deviceIds = Array.from({ length: 31 }, (_, i) =>
+        //     `sm-${(i + 1).toString().padStart(4, '0')}`
+        // );
+        const sikoDevsIds = Array.from({ length: 26 }, (_, i) =>
           `sm-${(i + 40).toString()}`
         );
 
@@ -114,7 +115,7 @@ export default {
     doSubscribe() {
         const { topic, qos } = this.subscription;
         this.client.subscribe(topic, { qos: qos });
-        this.client.subscribe("siko/+", { qos: qos }); // second topic
+        // this.client.subscribe("siko/+", { qos: qos }); // second topic
     },
     createConnection() {
         try {
@@ -170,7 +171,7 @@ export default {
               const found = this.all.find(dev => dev.id === key);
               if (found) {
                 found.power = value.toFixed(2);
-                found.online = 'online';
+                found.online = 'ready';
               }
             });
           }
