@@ -11,8 +11,9 @@
 import VChart from "vue-echarts";
 import axios from 'axios';
 import { mapState } from 'vuex';
-import { use } from 'echarts/core'
-import { LineChart } from 'echarts/charts'
+import { use } from 'echarts/core';
+import { LineChart } from 'echarts/charts';
+import { BarChart } from 'echarts/charts';
 import {
   TitleComponent,
   TooltipComponent,
@@ -32,6 +33,7 @@ use([
   ToolboxComponent,
   GridComponent,
   LineChart,
+  BarChart,
   CanvasRenderer,
   DataZoomComponent,
   
@@ -42,7 +44,7 @@ var timeLineSet = function(value) {
   let date = new Date(value);
 
   // Get UTC hours and minutes
-  let hours = date.getUTCHours() + 3;
+  let hours = date.getUTCHours();
   let minutes = date.getUTCMinutes();
 
   // Format hours and minutes to ensure two digits
@@ -118,7 +120,9 @@ export default {
                             <ul style="list-style-type: none; margin: 0; padding-left: 0;">
                             <li>
                                 <div class="color-point" style="width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 5px; background-color: ${param.color};"></div>
-                                <span style="color: gray;">${param.seriesName}: </span><span style="color: white;">${param.data[1]} MW/h</span>
+                                <span style="color: gray;">${param.seriesName}: </span><span style="color: white;">${
+                                  param.seriesName === 'Cost' ? param.data[1] + ' €' : param.data[1] + ' W'
+                                }</span>
                             </li>
                             </ul>
                         </div>`;
@@ -172,11 +176,22 @@ export default {
   yAxis: [
     {
       type: 'value',
+      name: 'Power',
       splitLine: {
-        show: false // Set this property to false to hide horizontal grid lines
+        show: false
       }
     },
-    
+    {
+      type: 'value',
+      name: 'Cost',
+      position: 'right',
+      axisLabel: {
+        formatter: '{value} €'
+      },
+      splitLine: {
+        show: false
+      }
+    }
   ],
   dataZoom: [{
       type: 'slider',
@@ -398,7 +413,7 @@ export default {
           
           
           if(devData){            
-           
+            
             //const devIds = Array.from(new Set(devData.map((item) => item.devId)));
             const devIds = Array.from({ length: 31 }, (_, i) =>
               `sm-${(i + 40).toString()}`
@@ -415,9 +430,7 @@ export default {
                 data: devData
                     .filter((item) => item.devId === devId)
                     .map((item) => [item[this.created_date_or_created], item.value]),
-            };
-            
-            
+            };           
            
             if (this.lastRouteSegment == 'entra') {
                 return {
@@ -427,12 +440,45 @@ export default {
                     areaStyle: {},            
                 };
             } else {
+
                 return {
                   ...baseSeriesConfig,
-                  itemStyle: {color:'#009efb'},
+                  itemStyle: {color:'#009efb'},                
                 }
             }
             });
+            if (this.lastRouteSegment !== 'entra' && devData.length > 0){
+                let cumulativeCost = 0;
+                const cumulativeData = devData.map(item => {
+                  cumulativeCost += item.cost;
+                  return [item[this.created_date_or_created], (cumulativeCost/4).toFixed(2)];
+                });
+                const costSeries = {
+                  name: 'Cost',
+                  type: 'bar',
+                  yAxisIndex: 1, // Use second Y-axis
+                  barWidth: '60%',
+                  itemStyle: {
+                    opacity: 0.5,
+                    color: {
+                      type: 'linear',
+                      x: 0,
+                      y: 0,
+                      x2: 0,
+                      y2: 1,
+                      colorStops: [
+                        { offset: 0, color: '#FFA500' }, // Orange at the top
+                        { offset: 1, color: '#8B0000' }  // Dark red at the bottom
+                      ],
+                    }
+                  },
+                  data: cumulativeData
+                };
+
+                seriesData.push(costSeries); // Add bar chart to the list of series
+            
+
+            }
             // Check if lastRouteSegment is not 'entra' and forecastData is not empty
             if (this.lastRouteSegment !== 'entra' && forecastData && forecastData.length > 0) {
                 let test = forecastData.map((item) =>[item.timestamp, item.power.toFixed(2)])
