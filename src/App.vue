@@ -88,8 +88,8 @@ export default {
         );
 
         deviceIds = deviceIds.concat(sikoDevsIds);
-
-
+        const additional_devices = ['sm-81', 'sm-82', 'sm-96', 'sm-97', 'sm-94', 'sm-95', 'sm-91', 'sm-92', 'sm-93']
+        deviceIds.push(...additional_devices)
         // Map device IDs to device objects, incorporating coords data
         this.all = deviceIds.map(id => {
             // Find coordinates for the current device, if available
@@ -107,7 +107,7 @@ export default {
             capacity: coord ? coord[id].capacity :undefined            
             };
            
-        });
+        });        
         
         this.allDevsCreation(this.all);
 
@@ -169,6 +169,7 @@ export default {
             // Update all relevant devices in `this.all`
             Object.entries(parsedPayload.payload).forEach(([key, value]) => {
               const found = this.all.find(dev => dev.id === key);
+              
               if (found) {
                 found.power = value.toFixed(2);
                 found.online = 'ready';

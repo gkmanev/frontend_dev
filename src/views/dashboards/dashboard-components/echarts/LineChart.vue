@@ -417,7 +417,10 @@ export default {
             //const devIds = Array.from(new Set(devData.map((item) => item.devId)));
             const devIds = Array.from({ length: 31 }, (_, i) =>
               `sm-${(i + 40).toString()}`
-            );  
+            );
+            const additional_devices = ['sm-81', 'sm-82', 'sm-96', 'sm-97', 'sm-94', 'sm-95', 'sm-91', 'sm-92', 'sm-93']
+            devIds.push(...additional_devices) 
+             
             const seriesData = devIds.map((devId) => {
               const baseSeriesConfig = {
                 name: devId,

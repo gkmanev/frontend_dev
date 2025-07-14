@@ -151,42 +151,31 @@
         //   }
         //   return dev;
         // });
-  
+
         const gridNames = [...new Set(gridAssignments.map(item => item.grid_name))];
         
         const treeData = gridNames.map(name => ({
           name,
           children: [],
-          value: 0,
+          
         }));
         
         gridAssignments.forEach(assignment => {
           
-          const device = onlineDevices.find(dev => dev.id === assignment.dev);          
+          const device = this.all_devs.find(dev => dev.id === assignment.dev);          
           if (device) {            
             const grid = treeData.find(grid => grid.name === assignment.grid_name);
             
-            if (grid) {
-      
+            if (grid) {              
               const deviceNode = {
-                name: `${device.id} | ${device.power} kW`,
-                value: device.power,
+                name: device.id,  // ✅ Only device name
               };
               
               grid.children.push(deviceNode);
             }
           }
         });
-       
-        treeData.forEach(nd=>{
-          let nodeValueSum = 0
-          const childPowerArray = nd.children
-          childPowerArray.forEach(sm=>{
-            nodeValueSum += parseFloat(sm.value)            
-          })
-          nd.value = nodeValueSum.toFixed(2)
-        })
-  
+         
         // treeData.forEach(grid => {
         //   grid.value = grid.children.reduce((acc, child) => acc + child.value, 0).toFixed(2);
         //   grid.name = `${grid.name} | ${grid.value} kW`;

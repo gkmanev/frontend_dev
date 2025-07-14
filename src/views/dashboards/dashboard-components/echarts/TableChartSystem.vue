@@ -10,7 +10,7 @@
            </template>
            <template #cell(edit)="{ item }">
             
-            <div v-if="item.online == 'not-ready'" class="d-flex align-items-center">
+            <div class="d-flex align-items-center">
               <!-- Button to open modal -->
                 <b-button size="sm" variant="primary" @click="openModal(item)">Details</b-button>
                 <!-- Display the cell value -->
@@ -326,10 +326,11 @@
          let url =  `http://85.14.6.37:16455/api/siko/?date_range=today`
          axios.get(url)
         .then(response => {
-          const data = response.data;  
+          const data = response.data;         
           const mostRecentTimestamp = data.reduce((latest, item) => {
             return new Date(item.created_date) > new Date(latest) ? item.created_date : latest;
           }, data[0]?.created_date); 
+
           const uniqueLatestRecords = Object.values(
             data
               .filter(item => item.created_date === mostRecentTimestamp)
