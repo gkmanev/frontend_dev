@@ -1,14 +1,14 @@
 <template>
     <b-row class="justify-content-start">        
-        <b-col cols="12">        
+        <!-- <b-col cols="12">        
             <AwesomeCards />
-        </b-col>
+        </b-col> -->
         <b-col cols="3">            
             <RangeComponent class="mb-4"  @filter="handleFilter" />          
         </b-col>
-        <!-- <b-col cols="12">
-            <HighChartTest />
-        </b-col> -->
+        <b-col cols="12">
+            <DatePicker />
+        </b-col>
         <b-col cols="12" v-if="show">
             <LineChart />
         </b-col>
@@ -40,13 +40,15 @@
   // -----------------------------------------
   // Import Components Here
   // -----------------------------------------
-  import AwesomeCards from "../dashboard-components/awesome-cards/AwesomeCards";  
+  //import AwesomeCards from "../dashboard-components/awesome-cards/AwesomeCards";  
   import RangeComponent from "../dashboard-components/range-component/RangeComponent";
   import LineChart from "../dashboard-components/echarts/LineChart";
   import PriceChart from "../dashboard-components/echarts/PriceChart";
   import TableChart from "../dashboard-components/echarts/TableChart";
 
+
   import GridNodes from "../dashboard-components/echarts/GridNodes";
+  import DatePicker from "../dashboard-components/date-picker/DatePicker.vue";
   //import MapCard from '../dashboard-components/echarts/MapCard.vue';
   //import HighChartTest from '../dashboard-components/echarts/HighChartTest.vue';
   
@@ -85,7 +87,7 @@
       ],
     }),
     components: {
-    AwesomeCards,    
+    //AwesomeCards,    
     RangeComponent,
     LineChart,
     PriceChart,
@@ -93,6 +95,7 @@
     //MapCard,
     GridNodes,
     //HighChartTest 
+    DatePicker
     
 },
     methods: {

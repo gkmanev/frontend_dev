@@ -88,7 +88,7 @@ export default {
         );
 
         deviceIds = deviceIds.concat(sikoDevsIds);
-        const additional_devices = ['sm-81', 'sm-82', 'sm-96', 'sm-97', 'sm-94', 'sm-95', 'sm-91', 'sm-92', 'sm-93']
+        const additional_devices = ['sm-81', 'sm-82','sm-83','sm-84','sm-85', 'sm-96', 'sm-97', 'sm-94', 'sm-95', 'sm-91', 'sm-92', 'sm-93']
         deviceIds.push(...additional_devices)
         // Map device IDs to device objects, incorporating coords data
         this.all = deviceIds.map(id => {

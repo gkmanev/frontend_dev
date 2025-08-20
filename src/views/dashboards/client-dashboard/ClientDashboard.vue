@@ -8,10 +8,10 @@
             <RangeComponent class="mb-4" />          
         </b-col>     
         
-        <b-col v-if="isDevSelected" cols="12">        
+        <!-- <b-col v-if="isDevSelected" cols="12">        
            
             <AwesomeCards />
-      </b-col>    
+      </b-col>     -->
       <b-col cols="12">
             <LineChart />
         </b-col>     
@@ -46,7 +46,7 @@
   import LineChart from "../dashboard-components/echarts/LineChart";  
   import PriceChart from "../dashboard-components/echarts/PriceChart"; 
   import WeatherChart from "../dashboard-components/echarts/WeatherChart"; 
-  import AwesomeCards from "../dashboard-components/awesome-cards/AwesomeCards";  
+ // import AwesomeCards from "../dashboard-components/awesome-cards/AwesomeCards";  
   //import CustomProgress from "../dashboard-components/progress-cards/CustomProgress.vue";
   import { mapState } from 'vuex';
   //import SalesCard from "../dashboard-components/sales-card/SalesCard.vue";
@@ -74,7 +74,7 @@
     SelectComponent,    
     RangeComponent,
     PriceChart,
-    AwesomeCards,
+   // AwesomeCards,
     WeatherChart,
    // CustomProgress,
     //SalesCard,

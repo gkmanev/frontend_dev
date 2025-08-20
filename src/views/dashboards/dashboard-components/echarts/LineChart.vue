@@ -396,24 +396,27 @@ export default {
         
         let requestOne = []
         if(url){
-          requestOne = axios.get(url);            
+          requestOne = axios.get(url);    
+          console.log("reqOne",requestOne)        
         }
         let requestTwo = [] 
         if (urlForecast)
         {
           requestTwo = axios.get(urlForecast); 
         }
+        requestTwo = []
         
         axios.all([requestOne, requestTwo]).then(axios.spread((...responses) => {
           
           let devData = responses[0].data  
+      
                 
 
           let forecastData = responses[1].data
           
           
           if(devData){            
-            
+     
             //const devIds = Array.from(new Set(devData.map((item) => item.devId)));
             const devIds = Array.from({ length: 31 }, (_, i) =>
               `sm-${(i + 40).toString()}`

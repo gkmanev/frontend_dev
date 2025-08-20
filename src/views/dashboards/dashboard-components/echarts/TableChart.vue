@@ -228,6 +228,7 @@
           this.online.forEach(entry => {
             const dev = deviceMap[entry.devId]
             if (dev) {
+              
               dev.online = entry.value >= 0 ? 'not-ready' : 'offline'
               dev.power = entry.value
             }            
@@ -247,7 +248,7 @@
         let url =  `http://85.14.6.37:16455/api/siko/?date_range=today`
          axios.get(url)
         .then(response => {
-          const data = response.data;  
+          const data = response.data.data;  
           const mostRecentTimestamp = data.reduce((latest, item) => {
             return new Date(item.created_date) > new Date(latest) ? item.created_date : latest;
           }, data[0]?.created_date); 

@@ -37,13 +37,17 @@
     computed: {
       ...mapState(['all_devs']),
     },
+    watch: {
+      all_devs: { handler() { this.fetchData(); }, immediate: false }
+    },
     methods: {
       defaultChartOption() {
         return {
           title: {
             text: 'Network',
             left: 'center',
-            padding: [1, 1, 1, 1],
+            padding: [1, 1, 5, 1],
+            
             textStyle: {
               fontSize: 16,
               color: 'white',
@@ -57,6 +61,7 @@
             {
               type: 'tree',
               id: 0,
+              nodePadding: 30,
               name: 'tree1',
               data: [{
                 name: 'Siko Trans',
@@ -64,7 +69,7 @@
               }],
             //   top: '25%',
             //   left: '8%',
-            //   bottom: '25%',
+            //   bottom: '25%',             
               right: '20%',
               symbolSize: 12,
               lineStyle: {
@@ -133,56 +138,41 @@
         return response.data;
       },
       updateTreeData(onlineDevices, gridAssignments) {
-        // console.log("onlineDevices",onlineDevices)
-        // console.log("gridAssignments",gridAssignments)
 
-        // const updatedDevices = this.all_devs.map(dev => {
-        //   const onlineInfo = onlineDevices.find(el => el.dev === dev.id);
-          
-        //   if (onlineInfo) {
-            
-        //     return {
-        //       ...dev,
-        //       ready: onlineInfo.ready,
-        //       pow: onlineInfo.pow,
-        //       providing: onlineInfo.providing,
-        //       online: this.determineDeviceStatus(onlineInfo),
-        //     };
-        //   }
-        //   return dev;
-        // });
+        const validAssignments = gridAssignments.filter(
+          a => a.grid_name && a.grid_name.toLowerCase() !== "test"
+        );
+        const gridsMap = new Map();
+        for (const { grid_name } of validAssignments) {
+          const key = String(grid_name).trim();
+          if (!gridsMap.has(key)) gridsMap.set(key, { name: key, children: [] });
+        }
 
-        const gridNames = [...new Set(gridAssignments.map(item => item.grid_name))];
-        
-        const treeData = gridNames.map(name => ({
-          name,
-          children: [],
-          
-        }));
-        
-        gridAssignments.forEach(assignment => {
-          
-          const device = this.all_devs.find(dev => dev.id === assignment.dev);          
-          if (device) {            
-            const grid = treeData.find(grid => grid.name === assignment.grid_name);
-            
-            if (grid) {              
-              const deviceNode = {
-                name: device.id,  // ✅ Only device name
-              };
-              
-              grid.children.push(deviceNode);
-            }
+        validAssignments.forEach(assignment => {
+          const key = String(assignment.grid_name).trim();
+          const grid = gridsMap.get(key);
+          if (!grid) return;
+
+          const device = this.all_devs.find(dev => dev.id === assignment.dev);
+          const deviceName = device ? device.id : assignment.dev;
+          if (!grid.children.some(c => c.name === deviceName)) {
+            grid.children.push({ name: deviceName });
           }
         });
-         
-        // treeData.forEach(grid => {
-        //   grid.value = grid.children.reduce((acc, child) => acc + child.value, 0).toFixed(2);
-        //   grid.name = `${grid.name} | ${grid.value} kW`;
-        // });
-  
-        this.chartOption.series[0].data = [{ name: 'Siko Trans', children: treeData }];
-      },
+
+        const treeData = Array.from(gridsMap.values());
+
+        this.chartOption = {
+          ...this.chartOption,
+          series: [
+            {
+              ...this.chartOption.series[0],
+              data: [{ name: 'Siko Trans', children: treeData }],
+            },
+          ],
+        };
+      }
+
       // determineDeviceStatus(device) {
       //   if (device.ready === 1) {
       //     return device.providing === 1 ? 'providing' : 'ready';
