@@ -38,6 +38,7 @@ export default {
 
   data() {
     return {
+      vocDataset: null,
       option: {
         title: {
           text: "VOC Sensor Readings",
@@ -196,16 +197,14 @@ export default {
     generateFakeVOCData() {
       const devices = ["sm-46", "sm-47"];
       const now = new Date();
-      const startOfMonth = new Date(
-        Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0)
-      );
+      const startOfYear = new Date(Date.UTC(now.getUTCFullYear(), 0, 1, 0, 0, 0, 0));
 
       const dataPerDevice = devices.reduce((acc, device) => {
         acc[device] = [];
         return acc;
       }, {});
 
-      const cursor = new Date(startOfMonth);
+      const cursor = new Date(startOfYear);
       while (cursor <= now) {
         devices.forEach((device) => {
           const value = Number((30 + Math.random() * 10).toFixed(2));
@@ -216,14 +215,22 @@ export default {
 
       return {
         devices,
-        start: startOfMonth.getTime(),
+        start: startOfYear.getTime(),
         end: now.getTime(),
         dataPerDevice,
       };
     },
 
     fetchData() {
-      const { devices, start, end, dataPerDevice } = this.generateFakeVOCData();
+      if (!this.vocDataset) {
+        this.vocDataset = this.generateFakeVOCData();
+      }
+
+      const { devices, dataPerDevice } = this.vocDataset;
+      const { filteredData, startTime, endTime } = this.filterDataForRange(
+        this.dateRange,
+        dataPerDevice
+      );
 
       const seriesData = devices.map((device) => ({
         name: device,
@@ -233,15 +240,78 @@ export default {
         connectNulls: true,
         lineStyle: { width: 1 },
         emphasis: { focus: "series" },
-        data: dataPerDevice[device],
+        data: filteredData[device],
       }));
 
-      this.option.xAxis.min = start;
-      this.option.xAxis.max = end;
+      this.option.xAxis.min = startTime;
+      this.option.xAxis.max = endTime;
       this.option.series = seriesData;
       this.option.legend.data = devices;
-      this.option.legend.selected = { "sm-46": true, "sm-47": true };
+      this.option.legend.selected = this.getLegendSelection(devices);
       this.option.title.text = "VOC Sensor Readings";
+    },
+    filterDataForRange(range, dataPerDevice) {
+      const { startTime, endTime } = this.getRangeBounds(range);
+
+      const filteredData = Object.entries(dataPerDevice).reduce(
+        (acc, [device, readings]) => {
+          acc[device] = readings.filter(([timestamp]) => {
+            const time = new Date(timestamp).getTime();
+            return time >= startTime && time <= endTime;
+          });
+          return acc;
+        },
+        {}
+      );
+
+      return { filteredData, startTime, endTime };
+    },
+    getRangeBounds(range) {
+      const now = new Date();
+      const startOfMonth = new Date(
+        Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0)
+      );
+      const startOfToday = new Date(
+        Date.UTC(
+          now.getUTCFullYear(),
+          now.getUTCMonth(),
+          now.getUTCDate(),
+          0,
+          0,
+          0,
+          0
+        )
+      );
+      const startOfYear = new Date(Date.UTC(now.getUTCFullYear(), 0, 1, 0, 0, 0, 0));
+
+      let startTime = startOfMonth.getTime();
+      if (range === "today") {
+        startTime = startOfToday.getTime();
+      } else if (range === "year") {
+        startTime = startOfYear.getTime();
+      }
+
+      return { startTime, endTime: now.getTime() };
+    },
+    getLegendSelection(devices) {
+      const selectBox = this.selectBoxDevs || {};
+      const hasCustomSelection = Object.keys(selectBox).length > 0;
+
+      if (!hasCustomSelection) {
+        return devices.reduce((acc, device) => {
+          acc[device] = true;
+          return acc;
+        }, {});
+      }
+
+      return devices.reduce((acc, device) => {
+        if (Object.prototype.hasOwnProperty.call(selectBox, device)) {
+          acc[device] = selectBox[device];
+        } else {
+          acc[device] = true;
+        }
+        return acc;
+      }, {});
     },
   },
 };
