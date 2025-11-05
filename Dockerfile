@@ -20,10 +20,7 @@ RUN npm run build
 
 
 # Build step 2(Deploying build on NGINX)
-FROM nginx:1.17
-
-# Update package lists and install necessary packages
-RUN apt-get update -y && apt-get install -y wget && rm -rf /var/lib/apt/lists/*
+FROM nginx:1.27-alpine
 
 # Clean up default Nginx HTML content
 RUN rm -rf /usr/share/nginx/html/*
