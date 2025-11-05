@@ -1,13 +1,15 @@
 # xtreme-vue2
 
 ## Project setup
+Ensure you are running Node.js 22 for compatibility with the provided tooling.
+
 ```
 npm install
 ```
 
 ### Compiles and hot-reloads for development
 ```
-npm run serve
+npm run dev
 ```
 
 ### Compiles and minifies for production
