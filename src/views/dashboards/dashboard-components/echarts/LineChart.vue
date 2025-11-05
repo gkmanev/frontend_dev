@@ -20,6 +20,7 @@ import {
   DataZoomComponent,
 } from "echarts/components";
 import { CanvasRenderer } from "echarts/renderers";
+import { filterDatasetByRange, getVocDataset } from "./sensorData";
 
 use([
   TitleComponent,
@@ -194,40 +195,13 @@ export default {
   },
 
   methods: {
-    generateFakeVOCData() {
-      const devices = ["sm-46", "sm-47"];
-      const now = new Date();
-      const startOfYear = new Date(Date.UTC(now.getUTCFullYear(), 0, 1, 0, 0, 0, 0));
-
-      const dataPerDevice = devices.reduce((acc, device) => {
-        acc[device] = [];
-        return acc;
-      }, {});
-
-      const cursor = new Date(startOfYear);
-      while (cursor <= now) {
-        devices.forEach((device) => {
-          const value = Number((30 + Math.random() * 10).toFixed(2));
-          dataPerDevice[device].push([cursor.toISOString(), value]);
-        });
-        cursor.setUTCHours(cursor.getUTCHours() + 1);
-      }
-
-      return {
-        devices,
-        start: startOfYear.getTime(),
-        end: now.getTime(),
-        dataPerDevice,
-      };
-    },
-
     fetchData() {
       if (!this.vocDataset) {
-        this.vocDataset = this.generateFakeVOCData();
+        this.vocDataset = getVocDataset();
       }
 
       const { devices, dataPerDevice } = this.vocDataset;
-      const { filteredData, startTime, endTime } = this.filterDataForRange(
+      const { filteredData, startTime, endTime } = filterDatasetByRange(
         this.dateRange,
         dataPerDevice
       );
@@ -249,49 +223,6 @@ export default {
       this.option.legend.data = devices;
       this.option.legend.selected = this.getLegendSelection(devices);
       this.option.title.text = "VOC Sensor Readings";
-    },
-    filterDataForRange(range, dataPerDevice) {
-      const { startTime, endTime } = this.getRangeBounds(range);
-
-      const filteredData = Object.entries(dataPerDevice).reduce(
-        (acc, [device, readings]) => {
-          acc[device] = readings.filter(([timestamp]) => {
-            const time = new Date(timestamp).getTime();
-            return time >= startTime && time <= endTime;
-          });
-          return acc;
-        },
-        {}
-      );
-
-      return { filteredData, startTime, endTime };
-    },
-    getRangeBounds(range) {
-      const now = new Date();
-      const startOfMonth = new Date(
-        Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0)
-      );
-      const startOfToday = new Date(
-        Date.UTC(
-          now.getUTCFullYear(),
-          now.getUTCMonth(),
-          now.getUTCDate(),
-          0,
-          0,
-          0,
-          0
-        )
-      );
-      const startOfYear = new Date(Date.UTC(now.getUTCFullYear(), 0, 1, 0, 0, 0, 0));
-
-      let startTime = startOfMonth.getTime();
-      if (range === "today") {
-        startTime = startOfToday.getTime();
-      } else if (range === "year") {
-        startTime = startOfYear.getTime();
-      }
-
-      return { startTime, endTime: now.getTime() };
     },
     getLegendSelection(devices) {
       const selectBox = this.selectBoxDevs || {};
