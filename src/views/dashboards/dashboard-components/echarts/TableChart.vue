@@ -43,6 +43,11 @@
 <script>
 import { mapState, mapActions } from "vuex";
 import axios from "axios";
+import {
+  getLatestReading,
+  getTemperatureDataset,
+  getVocDataset,
+} from "./sensorData";
 
 const ALLOWED_IDS = ["sm-46", "sm-47"];
 const CUSTOMER_MAP = {
@@ -192,13 +197,23 @@ export default {
         ALLOWED_IDS.includes(d.id)
       );
 
+      const vocDataset = getVocDataset();
+      const temperatureDataset = getTemperatureDataset();
+      const latestVocValues = getLatestReading(
+        vocDataset?.dataPerDevice || {}
+      );
+      const latestTemperatureValues = getLatestReading(
+        temperatureDataset?.dataPerDevice || {}
+      );
+
       const deviceMap = {};
       filteredBase.forEach((dev) => {
         deviceMap[dev.id] = {
           ...dev,
           customer: CUSTOMER_MAP[dev.id] || dev.customer || "",
-          voc: dev.voc ?? null,
-          temperature: dev.temperature ?? null,
+          voc: latestVocValues[dev.id] ?? dev.voc ?? null,
+          temperature:
+            latestTemperatureValues[dev.id] ?? dev.temperature ?? null,
           alarm: dev.alarm ?? null,
           selected: dev.selected ?? true, // default selected
         };
@@ -211,10 +226,16 @@ export default {
         if (dev) {
           dev.online = entry.value >= 0 ? "not-ready" : "offline";
           dev.power = entry.value;
-          dev.voc =
+          const fallbackVoc =
             entry.voc ?? entry.VOC ?? entry.vocValue ?? dev.voc ?? null;
-          dev.temperature =
-            entry.temperature ?? entry.temp ?? entry.tempC ?? dev.temperature ?? null;
+          const fallbackTemp =
+            entry.temperature ??
+            entry.temp ??
+            entry.tempC ??
+            dev.temperature ??
+            null;
+          dev.voc = fallbackVoc;
+          dev.temperature = fallbackTemp;
           dev.alarm =
             entry.alarm ?? entry.alarmStatus ?? entry.alert ?? dev.alarm ?? null;
         }

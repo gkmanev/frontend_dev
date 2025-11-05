@@ -19,6 +19,10 @@ import {
   GridComponent,
 } from "echarts/components";
 import { CanvasRenderer } from "echarts/renderers";
+import {
+  filterDatasetByRange,
+  getTemperatureDataset,
+} from "./sensorData";
 
 use([
   TitleComponent,
@@ -30,7 +34,7 @@ use([
   CanvasRenderer,
 ]);
 
-const DEVICES = ["Thermostat A", "Thermostat B"];
+const DEVICES = ["sm-46", "sm-47"];
 
 export default {
   name: "PriceChart",
@@ -149,35 +153,9 @@ export default {
   methods: {
     fetchData() {
       if (!this.temperatureDataset) {
-        this.temperatureDataset = this.generateFakeTemperatureData();
+        this.temperatureDataset = getTemperatureDataset();
       }
       this.applyTemperatureData();
-    },
-    generateFakeTemperatureData() {
-      const now = new Date();
-      const startOfYear = new Date(Date.UTC(now.getUTCFullYear(), 0, 1, 0, 0, 0, 0));
-      const dataPerDevice = DEVICES.reduce((acc, device) => {
-        acc[device] = [];
-        return acc;
-      }, {});
-
-      const cursor = new Date(startOfYear);
-      while (cursor <= now) {
-        DEVICES.forEach((device, index) => {
-          const base = 18.5 + index;
-          const variation = (Math.random() - 0.5) * 3.5; // Keeps values roughly between 18-22
-          const value = Math.min(22, Math.max(18, base + variation));
-          dataPerDevice[device].push([cursor.toISOString(), Number(value.toFixed(2))]);
-        });
-        cursor.setUTCHours(cursor.getUTCHours() + 1);
-      }
-
-      return {
-        devices: [...DEVICES],
-        start: startOfYear.getTime(),
-        end: now.getTime(),
-        dataPerDevice,
-      };
     },
     applyTemperatureData() {
       if (!this.temperatureDataset) {
@@ -185,7 +163,7 @@ export default {
       }
 
       const { devices, dataPerDevice } = this.temperatureDataset;
-      const { filteredData, startTime, endTime } = this.filterDataForRange(
+      const { filteredData, startTime, endTime } = filterDatasetByRange(
         this.dateRange,
         dataPerDevice
       );
@@ -208,49 +186,6 @@ export default {
 
       this.option.xAxis.min = startTime;
       this.option.xAxis.max = endTime;
-    },
-    filterDataForRange(range, dataPerDevice) {
-      const { startTime, endTime } = this.getRangeBounds(range);
-
-      const filteredData = Object.entries(dataPerDevice).reduce(
-        (acc, [device, readings]) => {
-          acc[device] = readings.filter(([timestamp]) => {
-            const time = new Date(timestamp).getTime();
-            return time >= startTime && time <= endTime;
-          });
-          return acc;
-        },
-        {}
-      );
-
-      return { filteredData, startTime, endTime };
-    },
-    getRangeBounds(range) {
-      const now = new Date();
-      const startOfMonth = new Date(
-        Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0)
-      );
-      const startOfToday = new Date(
-        Date.UTC(
-          now.getUTCFullYear(),
-          now.getUTCMonth(),
-          now.getUTCDate(),
-          0,
-          0,
-          0,
-          0
-        )
-      );
-      const startOfYear = new Date(Date.UTC(now.getUTCFullYear(), 0, 1, 0, 0, 0, 0));
-
-      let startTime = startOfMonth.getTime();
-      if (range === "today") {
-        startTime = startOfToday.getTime();
-      } else if (range === "year") {
-        startTime = startOfYear.getTime();
-      }
-
-      return { startTime, endTime: now.getTime() };
     },
   },
 };
