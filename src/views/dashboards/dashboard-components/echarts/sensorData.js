@@ -1,8 +1,10 @@
 const VOC_DEVICES = ["sm-46", "sm-47"];
 const TEMPERATURE_DEVICES = ["sm-46", "sm-47"];
+const HUMIDITY_DEVICES = ["sm-46", "sm-47"];
 
 let vocDatasetCache = null;
 let temperatureDatasetCache = null;
+let humidityDatasetCache = null;
 
 function generateHourlyTimestamps(start, end) {
   const cursor = new Date(start);
@@ -64,6 +66,32 @@ function generateTemperatureDataset() {
   };
 }
 
+function generateHumidityDataset() {
+  const now = new Date();
+  const startOfYear = new Date(
+    Date.UTC(now.getUTCFullYear(), 0, 1, 0, 0, 0, 0)
+  );
+
+  const timestamps = generateHourlyTimestamps(startOfYear, now);
+
+  const dataPerDevice = HUMIDITY_DEVICES.reduce((acc, device, index) => {
+    acc[device] = timestamps.map((timestamp) => {
+      const base = 52 + index * 2;
+      const variation = (Math.random() - 0.5) * 4;
+      const value = Math.min(60, Math.max(50, base + variation));
+      return [timestamp, Number(value.toFixed(2))];
+    });
+    return acc;
+  }, {});
+
+  return {
+    devices: [...HUMIDITY_DEVICES],
+    start: startOfYear.getTime(),
+    end: now.getTime(),
+    dataPerDevice,
+  };
+}
+
 export function getVocDataset() {
   if (!vocDatasetCache) {
     vocDatasetCache = generateVocDataset();
@@ -76,6 +104,13 @@ export function getTemperatureDataset() {
     temperatureDatasetCache = generateTemperatureDataset();
   }
   return temperatureDatasetCache;
+}
+
+export function getHumidityDataset() {
+  if (!humidityDatasetCache) {
+    humidityDatasetCache = generateHumidityDataset();
+  }
+  return humidityDatasetCache;
 }
 
 export function getLatestReading(dataPerDevice) {
@@ -136,4 +171,5 @@ export function getRangeBounds(range) {
 export function resetSensorDataCaches() {
   vocDatasetCache = null;
   temperatureDatasetCache = null;
+  humidityDatasetCache = null;
 }
