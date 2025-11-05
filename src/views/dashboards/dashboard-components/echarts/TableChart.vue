@@ -22,6 +22,18 @@
           <template #cell(status)="{ item }">
             <span class="led-indicator" :class="getLedClass(item.online)"></span>
           </template>
+
+          <template #cell(voc)="{ item }">
+            {{ formatDisplay(item.voc) }}
+          </template>
+
+          <template #cell(temperature)="{ item }">
+            {{ formatDisplay(item.temperature, "°C") }}
+          </template>
+
+          <template #cell(alarm)="{ item }">
+            {{ formatAlarm(item.alarm) }}
+          </template>
         </b-table>
       </b-card>
     </b-col>
@@ -33,6 +45,10 @@ import { mapState, mapActions } from "vuex";
 import axios from "axios";
 
 const ALLOWED_IDS = ["sm-46", "sm-47"];
+const CUSTOMER_MAP = {
+  "sm-46": "Костинброд",
+  "sm-47": "Балша",
+};
 
 export default {
   name: "SmartmeterTableSm46Sm47",
@@ -42,15 +58,13 @@ export default {
       selectMode: "multi",
       selected: [],
       fields: [
-        { key: "selected", sortable: false },
-        { key: "id", sortable: true },
-        { key: "status", sortable: true },
-        { key: "customer", sortable: true },
-        { key: "power", sortable: true, label: "Power kW" },
-        { key: "capacity", label: "Capacity" },
-        { key: "clsA", sortable: true, label: "Cluster A" },
-        { key: "clsB", sortable: true, label: "Cluster B" },
-        { key: "clsC", sortable: true, label: "Cluster C" },
+        { key: "selected", sortable: false, label: "Избрани" },
+        { key: "id", sortable: true, label: "Id" },
+        { key: "status", sortable: true, label: "Статус" },
+        { key: "customer", sortable: true, label: "Клиент" },
+        { key: "voc", sortable: true, label: "VOC" },
+        { key: "temperature", sortable: true, label: "Температура" },
+        { key: "alarm", sortable: true, label: "Аларма" },
       ],
       power: "",
       powerCorr: "",
@@ -135,6 +149,43 @@ export default {
       }
     },
 
+    formatDisplay(value, suffix = "") {
+      if (value === null || value === undefined || value === "") {
+        return "Няма данни";
+      }
+
+      return suffix ? `${value}${suffix}` : value;
+    },
+
+    formatAlarm(value) {
+      if (value === null || value === undefined || value === "") {
+        return "Няма данни";
+      }
+
+      const normalized =
+        typeof value === "string" ? value.toLowerCase() : value;
+
+      if (
+        normalized === true ||
+        normalized === 1 ||
+        normalized === "1" ||
+        normalized === "true"
+      ) {
+        return "Активна";
+      }
+
+      if (
+        normalized === false ||
+        normalized === 0 ||
+        normalized === "0" ||
+        normalized === "false"
+      ) {
+        return "Няма";
+      }
+
+      return value;
+    },
+
     updateDeviceStatus() {
       // Start from Vuex-provided all_devs, but keep only sm-46 & sm-47
       const filteredBase = (this.all_devs || []).filter((d) =>
@@ -145,6 +196,10 @@ export default {
       filteredBase.forEach((dev) => {
         deviceMap[dev.id] = {
           ...dev,
+          customer: CUSTOMER_MAP[dev.id] || dev.customer || "",
+          voc: dev.voc ?? null,
+          temperature: dev.temperature ?? null,
+          alarm: dev.alarm ?? null,
           selected: dev.selected ?? true, // default selected
         };
       });
@@ -156,11 +211,21 @@ export default {
         if (dev) {
           dev.online = entry.value >= 0 ? "not-ready" : "offline";
           dev.power = entry.value;
+          dev.voc =
+            entry.voc ?? entry.VOC ?? entry.vocValue ?? dev.voc ?? null;
+          dev.temperature =
+            entry.temperature ?? entry.temp ?? entry.tempC ?? dev.temperature ?? null;
+          dev.alarm =
+            entry.alarm ?? entry.alarmStatus ?? entry.alert ?? dev.alarm ?? null;
         }
       });
 
       // Finalize "all" table items: just the two, sorted numerically
       this.all = Object.values(deviceMap)
+        .map((dev) => ({
+          ...dev,
+          customer: CUSTOMER_MAP[dev.id] || dev.customer || "",
+        }))
         .sort((a, b) => {
           const aId = parseInt(a.id.split("-")[1], 10);
           const bId = parseInt(b.id.split("-")[1], 10);
