@@ -83,13 +83,11 @@ export default {
         // let deviceIds = Array.from({ length: 31 }, (_, i) =>
         //     `sm-${(i + 1).toString().padStart(4, '0')}`
         // );
-        const sikoDevsIds = Array.from({ length: 26 }, (_, i) =>
-          `sm-${(i + 40).toString()}`
-        );
+        const sikoDevsIds = ['sm-46', 'sm-47']
 
         deviceIds = deviceIds.concat(sikoDevsIds);
-        const additional_devices = ['sm-81', 'sm-82','sm-83','sm-84','sm-85', 'sm-96', 'sm-97', 'sm-94', 'sm-95', 'sm-91', 'sm-92', 'sm-93']
-        deviceIds.push(...additional_devices)
+        // const additional_devices = ['sm-81', 'sm-82','sm-83','sm-84','sm-85', 'sm-96', 'sm-97', 'sm-94', 'sm-95', 'sm-91', 'sm-92', 'sm-93']
+        // deviceIds.push(...additional_devices)
         // Map device IDs to device objects, incorporating coords data
         this.all = deviceIds.map(id => {
             // Find coordinates for the current device, if available
