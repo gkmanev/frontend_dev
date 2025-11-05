@@ -42,7 +42,7 @@ export default {
       vocDataset: null,
       option: {
         title: {
-          text: "VOC Sensor Readings",
+          text: "VOC Сензори",
           left: "center",
           textStyle: {
             fontSize: 16,
