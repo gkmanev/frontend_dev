@@ -34,6 +34,8 @@ use([
   CanvasRenderer,
 ]);
 
+const DEVICES = ["sm-46", "sm-47"];
+
 export default {
   name: "PriceChart",
   components: {
