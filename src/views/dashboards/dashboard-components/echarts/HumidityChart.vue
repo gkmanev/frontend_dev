@@ -41,7 +41,7 @@ export default {
       humidityDataset: null,
       option: {
         title: {
-          text: "Humidity Readings",
+          text: "Относителна влажност",
           left: "center",
           textStyle: {
             fontSize: 16,

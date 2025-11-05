@@ -46,7 +46,7 @@ export default {
       temperatureDataset: null,
       option: {
         title: {
-          text: "Temperature Readings",
+          text: "Температура",
           left: "center",
           textStyle: {
             fontSize: 16,
