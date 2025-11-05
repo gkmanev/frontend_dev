@@ -8,7 +8,6 @@
 
 <script>
 import VChart from "vue-echarts";
-import axios from "axios";
 import { mapState } from "vuex";
 import { use } from "echarts/core";
 import { LineChart } from "echarts/charts";
@@ -33,23 +32,15 @@ use([
   DataZoomComponent,
 ]);
 
-const timeLineSet = function (value) {
-  let date = new Date(value);
-  let hours = ("0" + date.getUTCHours()).slice(-2);
-  let minutes = ("0" + date.getUTCMinutes()).slice(-2);
-  return `${hours}:${minutes}`;
-};
-
 export default {
   name: "PowerChartSm46Sm47",
   components: { VChart },
 
   data() {
     return {
-      created_date_or_created: "created_date",
       option: {
         title: {
-          text: "Customer Power",
+          text: "VOC Sensor Readings",
           left: "center",
           textStyle: {
             fontSize: 16,
@@ -101,7 +92,7 @@ export default {
                       <li>
                         <span class="color-point" style="width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 5px; background-color: ${param.color};"></span>
                         <span style="color: gray;">${param.seriesName}: </span>
-                        <span style="color: white;">${param.data[1]} W</span>
+                        <span style="color: white;">${param.data[1]} ppb</span>
                       </li>
                     </ul>
                   </div>`;
@@ -138,7 +129,7 @@ export default {
         yAxis: [
           {
             type: "value",
-            name: "Power",
+            name: "VOC (ppb)",
             splitLine: { show: false },
           },
         ],
@@ -202,111 +193,55 @@ export default {
   },
 
   methods: {
-    setHourlyAxisLabels() {
-      this.option.xAxis.axisLabel = {
-        ...this.option.xAxis.axisLabel,
-        formatter: function (value) {
-          const date = new Date(value);
-          return `${date.getHours()}:00`;
-        },
-      };
-      this.option.xAxis.interval = 3600 * 1000;
-    },
-
-    setAxisTimeRange() {
+    generateFakeVOCData() {
+      const devices = ["sm-46", "sm-47"];
       const now = new Date();
-      const todayUTC = new Date(
-        Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+      const startOfMonth = new Date(
+        Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0)
       );
-      let start = new Date(todayUTC);
-      let end = new Date(todayUTC);
 
-      if (this.dateRange === "today") {
-        end.setUTCHours(23, 0, 0);
-        this.option.xAxis.axisLabel.formatter = timeLineSet;
-        this.option.xAxis.splitNumber = 23;
-      } else if (this.dateRange === "month") {
-        start.setUTCDate(1);
-        end.setUTCMonth(end.getUTCMonth() + 1, 0);
-        end.setUTCHours(23, 0, 0);
-        this.option.xAxis.axisLabel.formatter = [];
-        this.option.xAxis.splitNumber = 30;
-      } else if (this.dateRange === "year") {
-        start.setUTCMonth(0, 1);
-        end.setUTCFullYear(end.getUTCFullYear() + 1, 0, 0);
-        end.setUTCHours(23, 0, 0);
-        this.option.xAxis.axisLabel.formatter = [];
-        this.option.xAxis.splitNumber = 12;
+      const dataPerDevice = devices.reduce((acc, device) => {
+        acc[device] = [];
+        return acc;
+      }, {});
+
+      const cursor = new Date(startOfMonth);
+      while (cursor <= now) {
+        devices.forEach((device) => {
+          const value = Number((30 + Math.random() * 10).toFixed(2));
+          dataPerDevice[device].push([cursor.toISOString(), value]);
+        });
+        cursor.setUTCHours(cursor.getUTCHours() + 1);
       }
 
-      this.option.xAxis.min = start.getTime();
-      this.option.xAxis.max = end.getTime();
+      return {
+        devices,
+        start: startOfMonth.getTime(),
+        end: now.getTime(),
+        dataPerDevice,
+      };
     },
 
-    async fetchData() {
-      // choose correct timestamp field
-      this.created_date_or_created =
-        this.dateRange === "today" ? "created_date" : "created";
+    fetchData() {
+      const { devices, start, end, dataPerDevice } = this.generateFakeVOCData();
 
-      // Build URL
-      let url = "";
-      if (this.$route && this.lastRouteSegment === "entra") {
-        url =
-          this.dateRange === "today"
-            ? `http://85.14.6.37:16455/api/posts/?date_range=today`
-            : `http://85.14.6.37:16455/api/posts/?date_range=${this.dateRange}`;
-      } else if (this.selectedDev) {
-        url = `http://85.14.6.37:16455/api/posts/?date_range=${this.dateRange}&dev=${this.selectedDev}`;
+      const seriesData = devices.map((device) => ({
+        name: device,
+        type: "line",
+        sampling: "lttb",
+        showSymbol: false,
+        connectNulls: true,
+        lineStyle: { width: 1 },
+        emphasis: { focus: "series" },
+        data: dataPerDevice[device],
+      }));
 
-        // Resampling for "today" based on slider
-        if (this.dateRange === "today" && this.sliderValue && this.sliderValue.value) {
-          const v = Number(this.sliderValue.value);
-          const map = { 15: "15min", 30: "30min", 45: "45min", 60: "60min" };
-          if (map[v]) {
-            url = `http://85.14.6.37:16455/api/resample_data/?resample=${map[v]}&devId=${this.selectedDev}`;
-          }
-        }
-      }
-
-      if (!url) {
-        this.option.series = [];
-        return;
-      }
-
-      try {
-        const { data: devData } = await axios.get(url);
-
-        // Only these two device IDs
-        const devIds = ["sm-46", "sm-47"];
-
-        // Build the 2 line series, no stacking/area
-        const seriesData = devIds.map((devId) => {
-          const points = (devData || [])
-            .filter((item) => item.devId === devId)
-            .map((item) => [item[this.created_date_or_created], item.value]);
-
-          return {
-            name: devId,
-            type: "line",
-            sampling: "lttb",
-            showSymbol: false,
-            connectNulls: true,
-            lineStyle: { width: 1 },
-            emphasis: { focus: "series" },
-            data: points,
-          };
-        });
-
-        // Apply axis range and set series + legend
-        this.setAxisTimeRange();
-        this.option.series = seriesData;
-        this.option.legend.data = ["sm-46", "sm-47"];
-        this.option.legend.selected = { "sm-46": true, "sm-47": true };
-        this.option.title.text = "Power kW";
-      } catch (e) {
-        console.error(e);
-        this.option.series = [];
-      }
+      this.option.xAxis.min = start;
+      this.option.xAxis.max = end;
+      this.option.series = seriesData;
+      this.option.legend.data = devices;
+      this.option.legend.selected = { "sm-46": true, "sm-47": true };
+      this.option.title.text = "VOC Sensor Readings";
     },
   },
 };
