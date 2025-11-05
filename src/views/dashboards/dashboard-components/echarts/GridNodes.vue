@@ -64,8 +64,17 @@
               nodePadding: 30,
               name: 'tree1',
               data: [{
-                name: 'Siko Trans',
-                children: [],
+                name: 'ProTraid',
+                children: [
+                  {
+                    name: 'Kostinbrod',
+                    children: [{ name: 'sm-46' }],
+                  },
+                  {
+                    name: 'Balsha',
+                    children: [{ name: 'sm-47' }],
+                  },
+                ],
               }],
             //   top: '25%',
             //   left: '8%',
@@ -160,14 +169,23 @@
           }
         });
 
-        const treeData = Array.from(gridsMap.values());
+        const treeData = [
+          {
+            name: 'Kostinbrod',
+            children: [{ name: 'sm-46' }],
+          },
+          {
+            name: 'Balsha',
+            children: [{ name: 'sm-47' }],
+          },
+        ];
 
         this.chartOption = {
           ...this.chartOption,
           series: [
             {
               ...this.chartOption.series[0],
-              data: [{ name: 'Siko Trans', children: treeData }],
+              data: [{ name: 'ProTraid', children: treeData }],
             },
           ],
         };
