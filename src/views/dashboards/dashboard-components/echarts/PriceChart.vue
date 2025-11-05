@@ -155,15 +155,13 @@ export default {
     },
     generateFakeTemperatureData() {
       const now = new Date();
-      const startOfMonth = new Date(
-        Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0)
-      );
+      const startOfYear = new Date(Date.UTC(now.getUTCFullYear(), 0, 1, 0, 0, 0, 0));
       const dataPerDevice = DEVICES.reduce((acc, device) => {
         acc[device] = [];
         return acc;
       }, {});
 
-      const cursor = new Date(startOfMonth);
+      const cursor = new Date(startOfYear);
       while (cursor <= now) {
         DEVICES.forEach((device, index) => {
           const base = 18.5 + index;
@@ -176,7 +174,7 @@ export default {
 
       return {
         devices: [...DEVICES],
-        start: startOfMonth.getTime(),
+        start: startOfYear.getTime(),
         end: now.getTime(),
         dataPerDevice,
       };
@@ -212,31 +210,7 @@ export default {
       this.option.xAxis.max = endTime;
     },
     filterDataForRange(range, dataPerDevice) {
-      const now = new Date();
-      const startOfMonth = new Date(
-        Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0)
-      );
-      let rangeStart = startOfMonth;
-      let rangeEnd = now;
-
-      if (range === "today") {
-        rangeStart = new Date(
-          Date.UTC(
-            now.getUTCFullYear(),
-            now.getUTCMonth(),
-            now.getUTCDate(),
-            0,
-            0,
-            0,
-            0
-          )
-        );
-      } else if (range === "year") {
-        rangeStart = new Date(Date.UTC(now.getUTCFullYear(), 0, 1, 0, 0, 0, 0));
-      }
-
-      const startTime = rangeStart.getTime();
-      const endTime = rangeEnd.getTime();
+      const { startTime, endTime } = this.getRangeBounds(range);
 
       const filteredData = Object.entries(dataPerDevice).reduce(
         (acc, [device, readings]) => {
@@ -250,6 +224,33 @@ export default {
       );
 
       return { filteredData, startTime, endTime };
+    },
+    getRangeBounds(range) {
+      const now = new Date();
+      const startOfMonth = new Date(
+        Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0)
+      );
+      const startOfToday = new Date(
+        Date.UTC(
+          now.getUTCFullYear(),
+          now.getUTCMonth(),
+          now.getUTCDate(),
+          0,
+          0,
+          0,
+          0
+        )
+      );
+      const startOfYear = new Date(Date.UTC(now.getUTCFullYear(), 0, 1, 0, 0, 0, 0));
+
+      let startTime = startOfMonth.getTime();
+      if (range === "today") {
+        startTime = startOfToday.getTime();
+      } else if (range === "year") {
+        startTime = startOfYear.getTime();
+      }
+
+      return { startTime, endTime: now.getTime() };
     },
   },
 };
