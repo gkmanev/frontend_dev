@@ -11,13 +11,13 @@ npm install
 ```
 npm run dev
 ```
-The development script wraps the Vue CLI with `node --openssl-legacy-provider` so that Webpack 4 based tooling continues to run under Node.js 22's OpenSSL defaults.
+The development server now configures Webpack to use a SHA-256 hashing algorithm, letting the Vue CLI based toolchain run on Node.js 22 without legacy OpenSSL providers.
 
 ### Compiles and minifies for production
 ```
 npm run build
 ```
-The production build uses the same compatibility flag to ensure consistent behavior when targeting Node.js 22.
+Production builds leverage the same hashing configuration so the build pipeline stays compatible with Node.js 22.
 
 ### Lints and fixes files
 ```
