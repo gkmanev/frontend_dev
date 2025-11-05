@@ -27,7 +27,10 @@
         </b-col> -->
         <b-col cols="12">
             <PriceChart />
-        </b-col> 
+        </b-col>
+        <b-col cols="12">
+            <HumidityChart />
+        </b-col>
         <b-col cols="12">
             <WeatherChart />
         </b-col>   
@@ -44,7 +47,8 @@
   import SelectComponent from "../dashboard-components/select-component/SelectComponent";
   import RangeComponent from "../dashboard-components/range-component/RangeComponent";
   import LineChart from "../dashboard-components/echarts/LineChart";  
-  import PriceChart from "../dashboard-components/echarts/PriceChart"; 
+  import PriceChart from "../dashboard-components/echarts/PriceChart";
+  import HumidityChart from "../dashboard-components/echarts/HumidityChart";
   import WeatherChart from "../dashboard-components/echarts/WeatherChart"; 
  // import AwesomeCards from "../dashboard-components/awesome-cards/AwesomeCards";  
   //import CustomProgress from "../dashboard-components/progress-cards/CustomProgress.vue";
@@ -74,6 +78,7 @@
     SelectComponent,    
     RangeComponent,
     PriceChart,
+    HumidityChart,
    // AwesomeCards,
     WeatherChart,
    // CustomProgress,

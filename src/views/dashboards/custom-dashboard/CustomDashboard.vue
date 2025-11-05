@@ -15,6 +15,9 @@
         <b-col cols="12">
             <PriceChart />
         </b-col>
+        <b-col cols="12">
+            <HumidityChart />
+        </b-col>
         <!-- <b-col cols="12">
             <MapCard />
         </b-col> -->
@@ -44,6 +47,7 @@
   import RangeComponent from "../dashboard-components/range-component/RangeComponent";
   import LineChart from "../dashboard-components/echarts/LineChart";
   import PriceChart from "../dashboard-components/echarts/PriceChart";
+  import HumidityChart from "../dashboard-components/echarts/HumidityChart";
   import TableChart from "../dashboard-components/echarts/TableChart";
 
 
@@ -91,6 +95,7 @@
     RangeComponent,
     LineChart,
     PriceChart,
+    HumidityChart,
     TableChart,   
     //MapCard,
     GridNodes,
