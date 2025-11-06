@@ -9,9 +9,7 @@
     <!--End Logo icon -->
     <!-- Logo text -->
     <span class="logo-text ml-2">
-      <!-- dark Logo text -->
-      <img src="../../../assets/images/Untitled.png" alt="homepage" />
-      <!-- <h4 class="mt-4">Energy Platform 2.0</h4> -->
+      <h4 class="mt-4 mb-0">ProTraid</h4>
     </span>
   </b-navbar-brand>
 </template>
