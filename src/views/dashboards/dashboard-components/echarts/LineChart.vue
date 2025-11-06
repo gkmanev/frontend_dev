@@ -171,6 +171,9 @@ export default {
       const pathArray = this.$route.path.split("/");
       return pathArray.pop() || pathArray[pathArray.length - 1];
     },
+    isClientRoute() {
+      return this.lastRouteSegment === "client";
+    },
   },
 
   watch: {
@@ -206,7 +209,9 @@ export default {
         dataPerDevice
       );
 
-      const seriesData = devices.map((device) => ({
+      const devicesToDisplay = this.getDevicesForRoute(devices);
+
+      const seriesData = devicesToDisplay.map((device) => ({
         name: device,
         type: "line",
         sampling: "lttb",
@@ -214,15 +219,40 @@ export default {
         connectNulls: true,
         lineStyle: { width: 1 },
         emphasis: { focus: "series" },
-        data: filteredData[device],
+        data: filteredData[device] || [],
       }));
 
       this.option.xAxis.min = startTime;
       this.option.xAxis.max = endTime;
       this.option.series = seriesData;
-      this.option.legend.data = devices;
-      this.option.legend.selected = this.getLegendSelection(devices);
+      this.option.legend.data = devicesToDisplay;
+      this.option.legend.selected = this.getLegendSelectionForRoute(
+        devices,
+        devicesToDisplay
+      );
       this.option.title.text = "VOC Sensor Readings";
+    },
+    getDevicesForRoute(devices) {
+      if (!this.isClientRoute) {
+        return devices;
+      }
+
+      if (!this.selectedDev) {
+        return devices;
+      }
+
+      const filtered = devices.filter((device) => device === this.selectedDev);
+      return filtered.length ? filtered : devices;
+    },
+    getLegendSelectionForRoute(allDevices, devicesToDisplay) {
+      if (this.isClientRoute) {
+        return devicesToDisplay.reduce((acc, device) => {
+          acc[device] = true;
+          return acc;
+        }, {});
+      }
+
+      return this.getLegendSelection(allDevices);
     },
     getLegendSelection(devices) {
       const selectBox = this.selectBoxDevs || {};

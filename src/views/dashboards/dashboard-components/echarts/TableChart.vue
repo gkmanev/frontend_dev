@@ -48,12 +48,7 @@ import {
   getTemperatureDataset,
   getVocDataset,
 } from "./sensorData";
-
-const ALLOWED_IDS = ["sm-46", "sm-47"];
-const CUSTOMER_MAP = {
-  "sm-46": "Костинброд",
-  "sm-47": "Балша",
-};
+import { ALLOWED_IDS, CUSTOMER_MAP } from "./deviceConfig";
 
 export default {
   name: "SmartmeterTableSm46Sm47",
