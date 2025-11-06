@@ -9,9 +9,7 @@
     <!--End Logo icon -->
     <!-- Logo text -->
     <span class="logo-text ml-2">
-      <!-- dark Logo text -->
-      <img src="../../../assets/images/Untitled.png" alt="ProTraid v.1 logo" />
-      <!-- <h4 class="mt-4">ProTraid v.1</h4> -->
+      <h4 class="mt-4 mb-0">ProTraid</h4>
     </span>
   </b-navbar-brand>
 </template>
