@@ -66,7 +66,7 @@ export default {
       const options = this.availableDevices.map((deviceId) => {
         const deviceMeta = this.all_devs.find((dev) => dev.id === deviceId) || {};
         const label = getDisplayName(deviceId, deviceMeta.customer);
-        const status = deviceMeta.online ? ` • ${deviceMeta.online}` : "";
+        const status = this.formatStatus(deviceMeta.online);
         return {
           value: deviceId,
           text: `${label ? `${label} (${deviceId})` : deviceId}${status}`,
@@ -86,6 +86,9 @@ export default {
         this.selected = null;
         this.updateSelected(null);
       }
+    },
+    formatStatus() {
+      return " • Online";
     },
   },
 };
