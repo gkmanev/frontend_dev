@@ -3,20 +3,20 @@ export default [
   {
     id:"1200",
     icon: "zap",
-    title: "Entra Dash",
-    i18n: "Entra Dash", 
+    title: "Управление",
+    i18n: "Управление",
     to: "/dashboard/entra"
   },  
   {
     id:"1201",
     icon: "bar-chart",
-    title: "Client",     
+    title: "Клиент",
     to: "/dashboard/client"
   },
   {
     id:"1202",
     icon: "bar-chart",
-    title: "System",     
+    title: "Системен",
     to: "/dashboard/system"
   },
   // {
