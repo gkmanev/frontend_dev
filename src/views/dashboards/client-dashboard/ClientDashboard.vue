@@ -31,12 +31,6 @@
         <b-col cols="12">
             <HumidityChart />
         </b-col>
-        <b-col cols="12">
-            <WeatherChart />
-        </b-col>   
-        <b-col cols="12">
-            <WeatherChartClouds />
-        </b-col>   
     </b-row>
   </template>
   <script>
@@ -49,12 +43,10 @@
   import LineChart from "../dashboard-components/echarts/LineChart";  
   import PriceChart from "../dashboard-components/echarts/PriceChart";
   import HumidityChart from "../dashboard-components/echarts/HumidityChart";
-  import WeatherChart from "../dashboard-components/echarts/WeatherChart"; 
- // import AwesomeCards from "../dashboard-components/awesome-cards/AwesomeCards";  
+ // import AwesomeCards from "../dashboard-components/awesome-cards/AwesomeCards";
   //import CustomProgress from "../dashboard-components/progress-cards/CustomProgress.vue";
   import { mapState } from 'vuex';
   //import SalesCard from "../dashboard-components/sales-card/SalesCard.vue";
-  import WeatherChartClouds from "../dashboard-components/echarts/WeatherChartClouds.vue";
 
 //import CorelationsHeat from "../dashboard-components/echarts/CorelationsHeat.vue";
 //import SliderComponent from "../dashboard-components/slider-component/SliderComponent.vue";
@@ -80,10 +72,8 @@
     PriceChart,
     HumidityChart,
    // AwesomeCards,
-    WeatherChart,
    // CustomProgress,
     //SalesCard,
-    WeatherChartClouds,
    // CorelationsHeat,
     //SliderComponent
     

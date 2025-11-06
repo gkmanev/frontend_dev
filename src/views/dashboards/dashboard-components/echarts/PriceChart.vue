@@ -136,7 +136,11 @@ export default {
     };
   },
   computed: {
-    ...mapState(["dateRange"]),
+    ...mapState(["dateRange", "selectedDev"]),
+    isClientRoute() {
+      const path = this.$route?.path || "";
+      return path.includes("/dashboard/client");
+    },
   },
   mounted() {
     this.fetchData();
@@ -144,6 +148,11 @@ export default {
   watch: {
     dateRange(newRange, oldRange) {
       if (newRange !== oldRange) {
+        this.fetchData();
+      }
+    },
+    selectedDev(newDev, oldDev) {
+      if (newDev !== oldDev) {
         this.fetchData();
       }
     },
@@ -166,24 +175,38 @@ export default {
         dataPerDevice
       );
 
-      this.option.series = devices.map((device) => ({
+      const devicesToDisplay = this.getDevicesToDisplay(devices);
+
+      this.option.series = devicesToDisplay.map((device) => ({
         name: device,
         type: "line",
         sampling: "lttb",
         showSymbol: false,
         connectNulls: true,
         lineStyle: { width: 2 },
-        data: filteredData[device],
+        data: filteredData[device] || [],
       }));
 
-      this.option.legend.data = devices;
-      this.option.legend.selected = devices.reduce((acc, device) => {
+      this.option.legend.data = devicesToDisplay;
+      this.option.legend.selected = devicesToDisplay.reduce((acc, device) => {
         acc[device] = true;
         return acc;
       }, {});
 
       this.option.xAxis.min = startTime;
       this.option.xAxis.max = endTime;
+    },
+    getDevicesToDisplay(devices) {
+      if (!this.isClientRoute) {
+        return devices;
+      }
+
+      if (!this.selectedDev) {
+        return devices;
+      }
+
+      const filtered = devices.filter((device) => device === this.selectedDev);
+      return filtered.length ? filtered : devices;
     },
   },
 };
